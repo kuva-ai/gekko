@@ -1,0 +1,11 @@
+# ignore training folders
+Base_API/
+
+# ignore IDE specific files
+.vscode/
+
+# ignore ds_store files
+.DS_Store
+
+# ignore specific files
+index_local.html

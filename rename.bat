@@ -1,0 +1,1 @@
+ren redoc-static.html index.html

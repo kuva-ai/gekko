@@ -1,0 +1,1318 @@
+openapi: 3.0.0
+info:
+  description: |
+    Welcome to InfiIoT REST API documentation. Infi-IoT REST API allows for programmatic access to your account resources, including devices, variables, values and more.<br><br> To interact with Infi-IoT REST API, we recommend using an HTTPS client. Here are a few options:<br><ul><li>[Postman:](https://www.postman.com/) Powerful, simple-to-use GUI that makes API development faster, easier, and better. Comes with API request history, collections, environments, tests, sharing and more.</li><br><li>[cURL:](https://curl.haxx.se/) Command line HTTP client with an intuitive UI, JSON support, syntax highlighting, wget-like downloads, plugins, and more.</li></ul><br><h2>API URLs</h2><br>API access can be made over HTTP or HTTPS, using the following endpoints based on your Ubidots Account type.<br><br>Security Note:We strongly advise using HTTPS to make sure your data travels encrypted, and avoid exposing your API token and/or sensor data.<table><tr><th>Method</th><th>URL</th><th>Port</th></tr><tr><th>HTTP</th><th>http://infiiot.com</th><th>80</th></tr><tr><th>HTTPs</th><th>https://infiiot.com</th><th>443</th></tr></table>
+  version: "v1.0.0"
+  title: InfiIot Api
+  termsOfService: 'http://infiiot.com/terms-of-service/'  
+  contact:
+    name: Contact
+    email: info@infinitisystems.co.in
+    url: http://www.infiiot.com/contact-us
+    
+  license:
+    name: Copyright Infiiot 2020. All rights reserved
+
+servers:
+  - url: https://infiiot.com/api/v1.0
+    description: Development server
+    
+security:
+  - ApiKeyAuth: []
+  
+tags:
+  - name: User
+  - name: Devices
+  - name: Variables
+  - name: Dashboard
+  - name: Events & Triggers
+  
+paths:  
+               # --------------------------    login
+  /login:
+    post:
+      tags:
+        - User
+      description: verifies a user and returns tokenID 
+      operationId: login
+      parameters:
+        - name : login_username
+          in: query
+          required: true
+          description: username of the user
+          schema:
+            type: string
+            example: "test"
+        - name : login_password
+          in: query
+          required: true
+          description: password of the user
+          schema:
+            type: string
+            example: "test"
+          
+      responses:
+        200:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'    
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406'      
+                
+                  # --------------------------    logout
+  /logout:
+    post:
+      tags:
+        - User
+      description: verifies a user and ends sesson
+      operationId: logout
+      parameters:
+        - name : Auth-Token key
+          in: header
+          required: true
+          description: username of the user
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+      responses:
+        200:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  success:
+                    type: string
+                    example: "User Logged out succcessfully!"
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'
+                      
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406' 
+                
+                  # --------------------------    get-devices
+  /get-Device:
+    post:
+      tags:
+        - Devices
+      description: returns list of all the devices and variables inside them 
+      operationId: Get devices
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+      responses:
+        200:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Devices'    
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406'
+                
+# --------------------------    update-device
+  /update-Device:
+    post:
+      tags:
+        - Devices
+      description: updates location for device and variable data
+      operationId: Update Device
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+        - name : device
+          in: query
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "Weather Station"
+        - name : location
+          in: query
+          required: false
+          description: user's auth-token
+          schema:
+            type: object
+            properties: 
+              lat:
+                type: integer
+                example: 28.458945
+              long:
+                type: integer
+                example: 78.264895
+        - name: values
+          in: query
+          required: true
+          description: user's auth-token
+          schema:
+            type: array 
+            items:
+              $ref: '#/components/schemas/UpdateDevices'
+      responses:
+        201:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateDeviceResponse'    
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406'  
+                
+                # --------------------------    delete-device
+  /delete-Device:
+    post:
+      tags:
+        - Devices
+      description: Delete's a device 
+      operationId: Delete Device
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+        - name : device
+          in: query
+          required: true
+          description: device to delete
+          schema:
+            type: string
+            example: "Weather Station"
+      responses:
+        201:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/201'    
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406' 
+                
+                 # --------------------------    get-variable-data
+  /get-Variable:
+    post:
+      tags:
+        - Variables
+      description: Get all data inside Variable  '*' in values return all the data for the variable
+      operationId: Get Variable Data
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+        - name : device
+          in: query
+          required: true
+          description: project containing the variable
+          schema:
+            type: string
+            example: "Weather Station"
+        - name : variable
+          in: query
+          required: true
+          description: variable name to fetch data from
+          schema:
+            type: string
+            example: "Air Humidity"
+        - name : values
+          in: query
+          required: true
+          description: number of data values to fetch
+          schema:
+            type: string
+            example: "10"
+      responses:
+        200:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetVariable'    
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406'
+                
+ # --------------------------    get-variable-data-last-value
+  /get-Variable-lv:
+    post:
+      tags:
+        - Variables
+      description: Get last value for the data
+      operationId: Get Variable Last Value
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+        - name : device
+          in: query
+          required: true
+          description: project containing the variable
+          schema:
+            type: string
+            example: "Weather Station"
+        - name : variable
+          in: query
+          required: true
+          description: variable name to fetch data from
+          schema:
+            type: string
+            example: "Air Humidity"
+      responses:
+        200:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetVariablelv'    
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406'
+
+ # --------------------------    get-table-data
+  /get-Table-data:
+    post:
+      tags:
+        - Variables
+      description: Get data for table
+      operationId: Get data for table
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+        - name : device
+          in: query
+          required: true
+          description: project containing the variable
+          schema:
+            type: string
+            example: "Weather Station"
+        - name : variable
+          in: query
+          required: true
+          description: variable name to fetch data from
+          schema:
+            type: string
+            example: "Air Humidity"
+        - name : interval
+          in: query
+          required: true
+          description: "0: last hour<br>1: last 6 hours<br>2: last 24 hours<br>3: last 5 Days<br>4: last 15 Days<br>5: last Month<br>c: Custom Interval"
+          schema:
+            type: string
+            enum:
+              - "0"
+              - "1"
+              - "2"
+              - "3"
+              - "4"
+              - "5"
+              - "c"
+            example: "c"
+        - name : customInterval
+          in: query
+          required: false
+          description: custom interval
+          schema:
+            type: object
+            properties:
+              start:
+                type: string
+                example: "2020-03-01T09:47:54+0000"
+              end:
+                type: string
+                example: "2020-04-30T09:47:54+0000"
+        - name : onPage
+          in: query
+          required: true
+          description: pagination page number
+          schema:
+            type: number
+            example: 2
+      responses:
+        200:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTable'    
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406'
+                
+ # --------------------------    get-Chart-data
+  /get-Chart-data:
+    post:
+      tags:
+        - Variables
+      description: Get data for Chart
+      operationId: Get data for Chart
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+        - name : device
+          in: query
+          required: true
+          description: project containing the variable
+          schema:
+            type: string
+            example: "Weather Station"
+        - name : variable
+          in: query
+          required: true
+          description: variable name to fetch data from
+          schema:
+            type: string
+            example: "Air Humidity"
+        - name : interval
+          in: query
+          required: true
+          description: "0: last hour<br>1: last 6 hours<br>2: last 24 hours<br>3: last 5 Days<br>4: last 15 Days<br>5: last Month<br>c: Custom Interval"
+          schema:
+            type: string
+            enum:
+              - "0"
+              - "1"
+              - "2"
+              - "3"
+              - "4"
+              - "5"
+              - "c"
+            example: "c"
+        - name : customInterval
+          in: query
+          required: false
+          description: custom interval
+          schema:
+            type: object
+            properties:
+              start:
+                type: string
+                example: "2020-03-01T09:47:54+0000"
+              end:
+                type: string
+                example: "2020-04-30T09:47:54+0000"
+      responses:
+        200:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetChart'    
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406'
+                
+                 # --------------------------    update-Variable
+  /update-Variable:
+    post:
+      tags:
+        - Variables
+      description: update value for a variable 
+      operationId: Update Variable
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+        - name : device
+          in: query
+          required: true
+          description: project containing the variable
+          schema:
+            type: string
+            example: "Weather Station"
+        - name : variable
+          in: query
+          required: true
+          description: variable name to fetch data from
+          schema:
+            type: string
+            example: "Air Temperature"
+        - name : value
+          in: query
+          required: true
+          description: value to update for the variable
+          schema:
+            type: integer
+            example: 30
+        - name : timestamp
+          in: query
+          description: timestamp to update for the variable
+          schema:
+            type: string
+            example: "2006-09-14T04:40:00"
+        - name : unit
+          in: query
+          description: unit of variable
+          schema:
+            type: string
+            example: "*C"
+      responses:
+        201:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/201'    
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406' 
+                
+   # --------------------------    update-Variable-multiple
+  /update-Variable-multiple:
+    post:
+      tags:
+        - Variables
+      description: update value for a variable 
+      operationId: Update Variable multiple
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+        - name : device
+          in: query
+          required: true
+          description: project containing the variable
+          schema:
+            type: string
+            example: "Weather Station"
+        - name : values
+          in: query
+          required: true
+          description: value to update for the variable
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/UpdateVariable'
+              
+      responses:
+        201:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/201'    
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406' 
+                
+          # --------------------------    delete-variable
+  /delete-Variable:
+    post:
+      tags:
+        - Variables
+      description: Delete's a variable 
+      operationId: Delete Variable
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+        - name : device
+          in: query
+          required: true
+          description: device to delete
+          schema:
+            type: string
+            example: "Weather Station"
+        - name : variable
+          in: query
+          required: true
+          description: device to delete
+          schema:
+            type: string
+            example: "Air Temperature"
+      responses:
+        201:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/201'    
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406' 
+                
+                 # --------------------------    get-Dashboard-name
+  /get-Dashboard-name:
+    post:
+      tags:
+        - Dashboard
+      description: get list of all dashboards
+      operationId: Get Dashboard Names
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+      responses:
+        200:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardNames'   
+              
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406' 
+                
+                
+                 # --------------------------    get-Dashboard-name
+  /get-Dashboard:
+    post:
+      tags:
+        - Dashboard
+      description: get data related to dashboard
+      operationId: Get Dashboard data
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+        - name : dashboard
+          in: query
+          required: true
+          description: dashboard name
+          schema:
+            type: string
+            example: "Dashboard 1"
+        - name : interval
+          in: query
+          required: false
+          description: "0: last hour<br>1: last 6 hours<br>2: last 24 hours<br>3: last 5 Days<br>4: last 15 Days<br>5: last Month<br>c: Custom Interval"
+          schema:
+            type: string
+            enum:
+              - "0"
+              - "1"
+              - "2"
+              - "3"
+              - "4"
+              - "5"
+              - "c"
+            example: "c"
+        - name : customInterval
+          in: query
+          required: false
+          description: custom interval
+          schema:
+            type: object
+            properties:
+              start:
+                type: string
+                example: "2020-03-01T09:47:54+0000"
+              end:
+                type: string
+                example: "2020-04-30T09:47:54+0000"
+      responses:
+        200:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardData'   
+              
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406' 
+                              
+                
+                 # --------------------------    get-triggers
+  /get-Triggers:
+    post:
+      tags:
+        - Events & Triggers
+      description: get data related to all Events-N-Triggers
+      operationId: Get Events N Triggers
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+      responses:
+        200:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventsTriggers'   
+              
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406' 
+                
+                
+  # --------------------------    get-notifications
+  /get-Notifications:
+    post:
+      tags:
+        - Events & Triggers
+      description: get data related to all Events-N-Triggers
+      operationId: Get Notifications
+      parameters:
+        - name : token
+          in: header
+          required: true
+          description: user's auth-token
+          schema:
+            type: string
+            example: "48142b1e-d462-4bde-89d7-90947d5b97d"
+      responses:
+        200:
+          description: User is recognized and related information is sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notifications'   
+              
+        401:
+          description: User not recognized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401'  
+        406:
+          description: Wrong data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/406' 
+                
+                
+                 # --------------------------    Components
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Auth-Token
+      description: "Infi-IoT uses Auth (Authentication) Token key to authorize your device to ingest data inside your Infi-IoT account.<br><br>Authentication token keys are UUID 4 format keys that are generated when you register your Infi-IoT account. You can find your Auth token Key"
+  schemas:
+    User:
+      description: "Schema for User"
+      type: object
+      properties: 
+        token:
+          type: string
+          example: "4815221e-db62-43de-8dd7-90b479d59a7d"
+        username:
+          type: string
+          example: "rachel0907"
+        info:
+          type: string
+          example: "Hi, I am Rachel Morkozof. I am a Student."
+        phone:
+          type: string
+          example: "+917020818024"
+        image:
+          type: string
+          example: "/profile_image/test.png"
+        bday:
+          type: string
+          example: "09-07-1998"
+        designation:
+          type: string
+          example: "Bachelor Student"
+        last_updated:
+          type: string
+          example: "20200520T045150Z"
+        data_count:
+          type: number
+          example: 786
+        account_validity:
+          type: string
+          example: "2020-04-15"
+          
+    Devices:
+      description: "Schema for Devices"
+      type: object
+      properties: 
+        devices:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceList'
+          
+    DeviceList:
+      description: "Schema for device list"
+      type: object
+      properties: 
+        device:
+          type: string
+          example: "Weather Station"
+        variable:
+          type: string
+          example: "Air Temperature"
+        location:
+          type: object
+          properties: 
+            lat:
+              type: integer
+              example: "28.458945"
+            long:
+              type: integer
+              example: 78.264895
+              
+    UpdateDevices:
+      description: "Schema for updating device"
+      type: object
+      properties: 
+        variable:
+          type: string
+          example: "Air Temperature"
+        unit:
+          type: string
+          example: "*C"
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceValues'
+        
+            
+    DeviceValues:
+      description: "Schema for updating device"
+      type: object
+      properties:
+        value:
+          type: integer
+          example: 32
+        timestamp:
+          type: string
+          example: "20200520T045150Z"
+          
+    UpdateDeviceResponse:
+      description: "Schema for updating device"
+      type: object
+      properties:
+        success:
+          type: string
+          example: "Created -- Successful request + an item (device or variable) was created.!"
+       
+            
+    GetVariable:
+      description: "Schema for variables"
+      type: object
+      properties: 
+        variable:
+          type: string
+          example: "Air Temperature"
+        unit:
+          type: string
+          example: "*C"
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataList'
+          
+    DataList:
+      description: "Schema for variable list"
+      type: object
+      properties: 
+        value:
+          type: integer
+          example: 30  
+        timestamp:
+          type: string
+          example: "2006-09-14T04:40:00"
+          
+    GetVariablelv:
+      description: "Schema for variables"
+      type: object
+      properties: 
+        variable:
+          type: string
+          example: "Air Temperature"
+        unit:
+          type: string
+          example: "*C"
+        value:
+          type: integer
+          example: 30  
+        timestamp:
+          type: string
+          example: "2006-09-14T04:40:00"
+          
+    GetTable:
+      description: "Schema for table data"
+      type: object
+      properties:
+        variable:
+          type: string
+          example: "Air temperature"
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataList'
+        unit:
+          type: string
+          example: "*C"
+        totalPages:
+          type: number
+          example: 5 
+          
+    GetChart:
+      description: "Schema for chart data"
+      type: object
+      properties:
+        variable:
+          type: string
+          example: "Air temperature"
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataList'
+        unit:
+          type: string
+          example: "*C"
+        smooth:
+          type: boolean
+          example: true 
+        
+    UpdateVariable:
+      description: "Schema for Dashboard List"
+      type: object
+      properties: 
+        variable:
+          type: string
+          example: "Air Temperature"
+        unit:
+          type: string
+          example: "*C"
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceValues'     
+      
+    DashboardNames:
+      description: "Schema for Dashboard List"
+      type: object
+      properties: 
+        dashboardName:
+          type: object
+          example: {dash1: default, dash2, dash3}  ## To do
+          
+    DashboardData:
+      description: "Schema for Dashboard data"
+      type: object
+      properties: 
+        isLive:
+          type: boolean
+          example: true
+        interval:
+          type: string
+          example: c
+        cutomInterval:
+          type: object
+          properties:
+            start:
+              type: string
+              example: "2020-03-01T09:47:54+0000"
+            end:
+              type: string
+              example: "2020-03-01T09:47:54+0000"
+            
+    # DashInterval:
+    #   description:
+    #   type: object
+    #   properties:
+
+
+        
+          
+    EventsTriggers:
+      description: "Schema for Evenst and Triggers"
+      type: object
+      properties: 
+        events:
+          $ref: '#/components/schemas/EventsList'
+          
+    EventsList:
+      description: "Schema for Events and Triggers list"
+      type: object
+      properties: 
+        active:
+          type: boolean
+          example: "true"  
+        name:
+          type: string
+          example: "tank notification"
+        notification_type_name:
+          type: string
+          example: "SMS"
+        device:
+          type: string
+          example: "Weather Station"
+        variable:
+          type: string
+          example: "Air Temperature"
+        playwith:
+          type: string
+          example: "value"
+        operation:
+          type: string
+          example: ">"
+        targetvalue:
+          type: string
+          example: "30"
+        sendTo:
+          type: string
+          example: "+919898989898"
+          
+    Notifications:
+      description: "Schema for Notifications"
+      type: array
+      items:
+        $ref: '#/components/schemas/NotificationsList'
+          
+    NotificationsList:
+      description: "Schema for Notifications"
+      type: object
+      properties: 
+        eventid:
+          type: string
+          example: "8522152563"
+        triggerTime:
+          type: string
+          example: "2006-09-14T04:40:00"
+        triggerDetails:
+          type: object
+          properties:
+            name:
+              type: string
+              example: "tank notification"
+            notification_type_name:
+              type: string
+              example: "SMS"
+            device:
+              type: string
+              example: "Weather Station"
+            variable:
+              type: string
+              example: "Air Temperature"
+            playwith:
+              type: string
+              example: "value"
+            operation:
+              type: string
+              example: ">"
+            targetvalue:
+              type: string
+              example: "30"
+            sendTo:
+              type: string
+              example: "+919898989898"
+        
+        
+          
+    201:
+      description: "Schema for 201"
+      type: object
+      properties: 
+        success:
+          type: string
+          example: "Created -- Successful request + an item (device or variable) was created.!"
+          
+    # 202:
+    #   description: "Schema for 202"
+    #   type: object
+    #   properties: 
+    #     success:
+    #       type: string
+    #       example: "Accepted -- The request has been accepted for processing, but the processing has not been completed."
+          
+    # 204:
+    #   description: "Schema for 204"
+    #   type: object
+    #   properties: 
+    #     error:
+    #       type: string
+    #       example: "One of the fields is incorrect and the request is not saved -- Please verify it's a valid JSON string and that the fields are the ones expected by the endpoint (string, object or float)."
+          
+    # 400:
+    #   description: "Schema for 400"
+    #   type: object
+    #   properties: 
+    #     error:
+    #       type: string
+    #       example: "Bad Request -- Error due to an invalid body in your request. Please verify it's a valid JSON string and that the fields are the ones expected by the endpoint (string, object or float)."   
+          
+    401:
+      description: "Schema for 401"
+      type: object
+      properties: 
+        error:
+          type: string
+          example: "Invalid API key -- Please verify your API Key."
+          
+    # 402:
+    #   description: "Schema for 402"
+    #   type: object
+    #   properties: 
+    #     error:
+    #       type: string
+    #       example: "Payment required -- Please verify your balance."
+          
+    # 403:
+    #   description: "Schema for 403"
+    #   type: object
+    #   properties: 
+    #     error:
+    #       type: string
+    #       example: "Forbidden -- This token is not valid. Please verify your token."
+          
+    # 404:
+    #   description: "Schema for 404"
+    #   type: object
+    #   properties: 
+    #     error:
+    #       type: string
+    #       example: "Not Found -- We couldn't find the URL you're trying to access. This might be due to a wrong device label or ID, a wrong variable label or ID, or simply a typo in the URL of the request."
+          
+    # 405:
+    #   description: "Schema for 405"
+    #   type: object
+    #   properties: 
+    #     error:
+    #       type: string
+    #       example: "Method Not Allowed -- This API endpoint does not accept the method used. Check our API docs to see the allowed methods."
+          
+    406:
+      description: "Schema for 405"
+      type: object
+      properties: 
+        error:
+          type: string
+          example: "Wrong data format!"
+          
+          
+    # 415:
+    #   description: "Schema for 415"
+    #   type: object
+    #   properties: 
+    #     error:
+    #       type: string
+    #       example: "Unsupported media type -- The payload is in a format not supported by this method on the target resource."
+          
+          
+    # 420:
+    #   description: "Schema for 420"
+    #   type: object
+    #   properties: 
+    #     error:
+    #       type: string
+    #       example: "You have exceeded your API limits -- To upgrade your API limits contacts the Infi-IoT team"
+          
+          
+    # 423:
+    #   description: "Schema for 423"
+    #   type: object
+    #   properties: 
+    #     error:
+    #       type: string
+    #       example: "Device does not receive data because it is disabled"
+          
+          
+    # 429:
+    #   description: "Schema for 429"
+    #   type: object
+    #   properties: 
+    #     error:
+    #       type: string
+    #       example: "Too many requests -- Many requests sent in a given amount of time (\"rate limiting\")"
+          
+          
+    # 50:
+    #   description: "Schema for 50"
+    #   type: object
+    #   properties: 
+    #     error:
+    #       type: string
+    #       example: "Internal Error -- We're having issues with our servers. Please check our status page."
